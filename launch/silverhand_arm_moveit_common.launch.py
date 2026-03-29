@@ -33,7 +33,7 @@ def generate_launch_description():
     rviz_config = LaunchConfiguration("rviz_config")
 
     description_file = PathJoinSubstitution(
-        [FindPackageShare("silverhand_arm_description"), "urdf", "silverhand.urdf.xacro"]
+        [FindPackageShare("silverhand_arm_model"), "urdf", "silverhand.urdf.xacro"]
     )
 
     robot_description_content = Command(
@@ -41,15 +41,6 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             description_file,
-            " ",
-            "use_mock_hardware:=",
-            use_mock_hardware,
-            " ",
-            "can_iface:=",
-            can_iface,
-            " ",
-            "node_id:=",
-            node_id,
         ]
     )
 
@@ -105,7 +96,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
                 [
-                    FindPackageShare("silverhand_arm_bringup"),
+                    FindPackageShare("silverhand_arm_control"),
                     "launch",
                     "silverhand_arm_bringup.launch.py",
                 ]

@@ -66,9 +66,8 @@ ros2 pkg list | rg silverhand
 ```
 
 Expected packages:
-- `silverhand_arm_description`
-- `silverhand_arm_bringup`
-- `silverhand_arm_hardware`
+- `silverhand_arm_model`
+- `silverhand_arm_control`
 - `silverhand_moveit2`
 
 ## Launch
@@ -105,6 +104,6 @@ ros2 launch silverhand_moveit2 silverhand_arm_moveit_real.launch.py can_iface:=c
 
 ## Notes
 
-- `silverhand_moveit2` depends on packages from `silverhand_ros2`, especially `silverhand_arm_description` and `silverhand_arm_bringup`.
+- `silverhand_moveit2` depends on the lower-layer arm packages, especially `silverhand_arm_model` and `silverhand_arm_control`.
 - In WSL, `RViz`, `DDS` and `TF` warnings may appear because of network and timing issues even when the launch setup is correct.
 - Final runtime validation for real hardware is best done on a full Linux machine rather than inside WSL.

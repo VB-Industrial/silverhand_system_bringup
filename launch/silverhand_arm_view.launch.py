@@ -9,15 +9,13 @@ def generate_launch_description():
     rviz_config = LaunchConfiguration("rviz_config")
 
     description_file = PathJoinSubstitution(
-        [FindPackageShare("silverhand_arm_description"), "urdf", "silverhand.urdf.xacro"]
+        [FindPackageShare("silverhand_arm_model"), "urdf", "silverhand.urdf.xacro"]
     )
     robot_description_content = Command(
         [
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             description_file,
-            " ",
-            "use_mock_hardware:=true",
         ]
     )
     robot_description = {"robot_description": robot_description_content}
