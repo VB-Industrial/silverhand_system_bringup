@@ -14,7 +14,7 @@ def generate_launch_description():
     launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
-                [FindPackageShare("silverhand_rover_bringup"), "launch", "silverhand_rover_bringup.launch.py"]
+                [FindPackageShare("silverhand_rover_control"), "launch", "silverhand_rover_bringup.launch.py"]
             )
         ),
         launch_arguments={
