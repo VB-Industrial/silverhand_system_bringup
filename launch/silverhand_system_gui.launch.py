@@ -12,7 +12,7 @@ def generate_launch_description():
     launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
-                [FindPackageShare("silverhand_moveit2"), "launch", "silverhand_arm_moveit_common.launch.py"]
+                [FindPackageShare("silverhand_system_bringup"), "launch", "silverhand_system_common.launch.py"]
             )
         ),
         launch_arguments={
@@ -29,7 +29,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "rviz_config",
                 default_value=PathJoinSubstitution(
-                    [FindPackageShare("silverhand_moveit2"), "config", "moveit.rviz"]
+                    [FindPackageShare("silverhand_system_bringup"), "config", "moveit.rviz"]
                 ),
             ),
             launch,

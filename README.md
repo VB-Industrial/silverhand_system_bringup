@@ -1,6 +1,6 @@
-# silverhand_moveit2
+# silverhand_system_bringup
 
-Upper-level RViz and MoveIt 2 package for the Silverhand arm and gripper.
+Upper-level system bringup package for Silverhand control, MoveIt, and visualization.
 
 The package keeps MoveIt 2 integration in one place and composes:
 - arm model from `silverhand_arm_model`
@@ -15,16 +15,16 @@ Current scope:
 - split launch modes for `robot` and `gui`
 
 Package:
-- `silverhand_moveit2`
+- `silverhand_system_bringup`
 
 Launch files:
-- `silverhand_arm_moveit_robot.launch.py`
-- `silverhand_arm_moveit_gui.launch.py`
-- `silverhand_arm_view.launch.py`
-- `silverhand_arm_moveit_mock_rviz.launch.py`
-- `silverhand_arm_moveit_mock.launch.py`
-- `silverhand_arm_moveit_real_rviz.launch.py`
-- `silverhand_arm_moveit_real.launch.py`
+- `silverhand_system_robot.launch.py`
+- `silverhand_system_gui.launch.py`
+- `silverhand_system_view.launch.py`
+- `silverhand_system_mock_rviz.launch.py`
+- `silverhand_system_mock.launch.py`
+- `silverhand_system_real_rviz.launch.py`
+- `silverhand_system_real.launch.py`
 
 ## Prerequisites
 
@@ -49,14 +49,14 @@ sudo apt-get install -y \
 
 ## Workspace Layout
 
-Recommended layout: build `silverhand_moveit2` together with the lower-layer arm and hand packages in the same workspace.
+Recommended layout: build `silverhand_system_bringup` together with the lower-layer arm and hand packages in the same workspace.
 
 ```bash
 ~/silver_ws/src/silverhand_arm_model
 ~/silver_ws/src/silverhand_arm_control
 ~/silver_ws/src/silverhand_hand_model
 ~/silver_ws/src/silverhand_hand_control
-~/silver_ws/src/silverhand_moveit2
+~/silver_ws/src/silverhand_system_bringup
 ```
 
 Optional package if you also keep a combined top-level description:
@@ -79,7 +79,7 @@ If the lower-layer packages are built separately, source order must be:
 ```bash
 source /opt/ros/jazzy/setup.bash
 source /path/to/lower_layer/install/setup.bash
-source /path/to/silverhand_moveit2/install/setup.bash
+source /path/to/silverhand_system_bringup/install/setup.bash
 ```
 
 ## Packages Check
@@ -93,7 +93,7 @@ Expected packages:
 - `silverhand_arm_control`
 - `silverhand_hand_model`
 - `silverhand_hand_control`
-- `silverhand_moveit2`
+- `silverhand_system_bringup`
 
 ## Launch
 
@@ -108,19 +108,19 @@ Runtime modes:
 Viewer only:
 
 ```bash
-ros2 launch silverhand_moveit2 silverhand_arm_view.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_view.launch.py
 ```
 
 Robot machine, role-based launch:
 
 ```bash
-ros2 launch silverhand_moveit2 silverhand_arm_moveit_robot.launch.py use_mock_hardware:=true
+ros2 launch silverhand_system_bringup silverhand_system_robot.launch.py use_mock_hardware:=true
 ```
 
 Robot machine with real hardware:
 
 ```bash
-ros2 launch silverhand_moveit2 silverhand_arm_moveit_robot.launch.py \
+ros2 launch silverhand_system_bringup silverhand_system_robot.launch.py \
   use_mock_hardware:=false \
   arm_can_iface:=can0 arm_node_id:=100 \
   hand_can_iface:=can0 hand_node_id:=120
@@ -129,31 +129,31 @@ ros2 launch silverhand_moveit2 silverhand_arm_moveit_robot.launch.py \
 GUI machine with RViz:
 
 ```bash
-ros2 launch silverhand_moveit2 silverhand_arm_moveit_gui.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_gui.launch.py
 ```
 
 GUI machine without RViz:
 
 ```bash
-ros2 launch silverhand_moveit2 silverhand_arm_moveit_gui.launch.py use_rviz:=false
+ros2 launch silverhand_system_bringup silverhand_system_gui.launch.py use_rviz:=false
 ```
 
 Local all-in-one launch with mock hardware and RViz:
 
 ```bash
-ros2 launch silverhand_moveit2 silverhand_arm_moveit_mock_rviz.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_mock_rviz.launch.py
 ```
 
 Local all-in-one launch with mock hardware, no RViz:
 
 ```bash
-ros2 launch silverhand_moveit2 silverhand_arm_moveit_mock.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_mock.launch.py
 ```
 
 Local all-in-one launch with real hardware and RViz:
 
 ```bash
-ros2 launch silverhand_moveit2 silverhand_arm_moveit_real_rviz.launch.py \
+ros2 launch silverhand_system_bringup silverhand_system_real_rviz.launch.py \
   arm_can_iface:=can0 arm_node_id:=100 \
   hand_can_iface:=can0 hand_node_id:=120
 ```
@@ -161,24 +161,24 @@ ros2 launch silverhand_moveit2 silverhand_arm_moveit_real_rviz.launch.py \
 Local all-in-one launch with real hardware, no RViz:
 
 ```bash
-ros2 launch silverhand_moveit2 silverhand_arm_moveit_real.launch.py \
+ros2 launch silverhand_system_bringup silverhand_system_real.launch.py \
   arm_can_iface:=can0 arm_node_id:=100 \
   hand_can_iface:=can0 hand_node_id:=120
 ```
 
 ## Notes
 
-- `silverhand_moveit2` composes the arm and gripper into one MoveIt setup with two controllers: `arm_controller` and `hand_controller`.
-- `silverhand_moveit2` depends on the lower-layer arm and gripper packages, especially `silverhand_arm_model`, `silverhand_arm_control`, `silverhand_hand_model`, and `silverhand_hand_control`.
+- `silverhand_system_bringup` currently composes the arm and gripper into one MoveIt and control bringup with two controllers: `arm_controller` and `hand_controller`.
+- `silverhand_system_bringup` depends on the lower-layer arm and gripper packages, especially `silverhand_arm_model`, `silverhand_arm_control`, `silverhand_hand_model`, and `silverhand_hand_control`.
 - Planning configuration lives in this package, while hardware access stays in the lower-layer control packages.
 
 ## Two-Machine Startup Order
 
 Recommended startup sequence:
 
-1. On the robot computer, launch `silverhand_arm_moveit_robot.launch.py`.
+1. On the robot computer, launch `silverhand_system_robot.launch.py`.
 2. Wait until `move_group` and both controllers are up.
-3. On the GUI computer, launch `silverhand_arm_moveit_gui.launch.py`.
+3. On the GUI computer, launch `silverhand_system_gui.launch.py`.
 4. Start teleoperation tools after the robot-side nodes are already visible in ROS 2 discovery.
 
 Typical split:
@@ -209,5 +209,5 @@ python3 -m py_compile launch/*.py
 source /opt/ros/jazzy/setup.bash
 xacro urdf/silverhand_arm_hand.urdf.xacro > /tmp/silverhand_arm_hand.urdf
 cd ~/silver_ws
-colcon build --packages-select silverhand_moveit2
+colcon build --packages-select silverhand_system_bringup
 ```

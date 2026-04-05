@@ -14,14 +14,14 @@ def generate_launch_description():
     launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
-                [FindPackageShare("silverhand_moveit2"), "launch", "silverhand_arm_moveit_common.launch.py"]
+                [FindPackageShare("silverhand_system_bringup"), "launch", "silverhand_system_common.launch.py"]
             )
         ),
         launch_arguments={
             "use_rviz": "true",
             "run_robot_bringup": "true",
             "run_move_group": "true",
-            "use_mock_hardware": "false",
+            "use_mock_hardware": "true",
             "arm_can_iface": arm_can_iface,
             "arm_node_id": arm_node_id,
             "hand_can_iface": hand_can_iface,

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>silverhand_moveit2</name>
+  <name>silverhand_system_bringup</name>
   <version>0.1.0</version>
-  <description>Upper-level MoveIt 2 and RViz configuration for the Silverhand arm.</description>
+  <description>Upper-level system bringup package for Silverhand control, MoveIt, and visualization.</description>
   <maintainer email="r@example.com">r</maintainer>
   <license>MIT</license>
 

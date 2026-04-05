@@ -36,10 +36,10 @@ def generate_launch_description():
     rviz_config = LaunchConfiguration("rviz_config")
 
     description_file = PathJoinSubstitution(
-        [FindPackageShare("silverhand_moveit2"), "urdf", "silverhand_arm_hand.urdf.xacro"]
+        [FindPackageShare("silverhand_system_bringup"), "urdf", "silverhand_arm_hand.urdf.xacro"]
     )
     ros2_controllers_file = PathJoinSubstitution(
-        [FindPackageShare("silverhand_moveit2"), "config", "ros2_controllers.yaml"]
+        [FindPackageShare("silverhand_system_bringup"), "config", "ros2_controllers.yaml"]
     )
 
     robot_description_content = Command(
@@ -68,23 +68,23 @@ def generate_launch_description():
     robot_description = {"robot_description": robot_description_content}
     robot_description_semantic = {
         "robot_description_semantic": load_file(
-            "silverhand_moveit2", "config/silverhand.srdf"
+            "silverhand_system_bringup", "config/silverhand.srdf"
         )
     }
     robot_description_kinematics = {
         "robot_description_kinematics": load_yaml(
-            "silverhand_moveit2", "config/kinematics.yaml"
+            "silverhand_system_bringup", "config/kinematics.yaml"
         )
     }
     robot_description_planning = {
         "robot_description_planning": load_yaml(
-            "silverhand_moveit2", "config/joint_limits.yaml"
+            "silverhand_system_bringup", "config/joint_limits.yaml"
         )
     }
     moveit_controllers = load_yaml(
-        "silverhand_moveit2", "config/moveit_controllers.yaml"
+        "silverhand_system_bringup", "config/moveit_controllers.yaml"
     )
-    ompl_config = load_yaml("silverhand_moveit2", "config/ompl_planning.yaml")
+    ompl_config = load_yaml("silverhand_system_bringup", "config/ompl_planning.yaml")
 
     planning_pipeline = {
         "planning_pipelines": ["ompl"],
@@ -203,7 +203,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "rviz_config",
                 default_value=PathJoinSubstitution(
-                    [FindPackageShare("silverhand_moveit2"), "config", "moveit.rviz"]
+                    [FindPackageShare("silverhand_system_bringup"), "config", "moveit.rviz"]
                 ),
             ),
             static_tf,

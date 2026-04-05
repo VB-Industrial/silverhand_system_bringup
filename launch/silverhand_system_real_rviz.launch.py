@@ -6,7 +6,6 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     arm_can_iface = LaunchConfiguration("arm_can_iface")
     arm_node_id = LaunchConfiguration("arm_node_id")
     hand_can_iface = LaunchConfiguration("hand_can_iface")
@@ -15,14 +14,14 @@ def generate_launch_description():
     launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
-                [FindPackageShare("silverhand_moveit2"), "launch", "silverhand_arm_moveit_common.launch.py"]
+                [FindPackageShare("silverhand_system_bringup"), "launch", "silverhand_system_common.launch.py"]
             )
         ),
         launch_arguments={
-            "use_rviz": "false",
+            "use_rviz": "true",
             "run_robot_bringup": "true",
             "run_move_group": "true",
-            "use_mock_hardware": use_mock_hardware,
+            "use_mock_hardware": "false",
             "arm_can_iface": arm_can_iface,
             "arm_node_id": arm_node_id,
             "hand_can_iface": hand_can_iface,
@@ -32,7 +31,6 @@ def generate_launch_description():
 
     return LaunchDescription(
         [
-            DeclareLaunchArgument("use_mock_hardware", default_value="true"),
             DeclareLaunchArgument("arm_can_iface", default_value="can0"),
             DeclareLaunchArgument("arm_node_id", default_value="100"),
             DeclareLaunchArgument("hand_can_iface", default_value="can0"),

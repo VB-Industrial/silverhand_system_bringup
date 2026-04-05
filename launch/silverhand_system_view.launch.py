@@ -53,7 +53,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "rviz_config",
                 default_value=PathJoinSubstitution(
-                    [FindPackageShare("silverhand_moveit2"), "config", "view.rviz"]
+                    [FindPackageShare("silverhand_system_bringup"), "config", "view.rviz"]
                 ),
             ),
             static_tf,

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(silverhand_moveit2)
+project(silverhand_system_bringup)
 
 find_package(ament_cmake REQUIRED)
 
