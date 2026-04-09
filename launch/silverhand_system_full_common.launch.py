@@ -1,6 +1,7 @@
 from pathlib import Path
 import copy
 import os
+import tempfile
 import yaml
 
 from ament_index_python.packages import get_package_share_directory
@@ -190,7 +191,9 @@ def create_runtime_nodes(context):
     ompl_config = load_yaml("silverhand_system_bringup", "config/ompl_planning.yaml")
     controllers_wheel = load_yaml("silverhand_system_bringup", "config/system_controllers_wheel.yaml")
     controllers_imu = load_yaml("silverhand_system_bringup", "config/system_controllers_imu.yaml")
-    ekf_config = load_yaml("silverhand_rover_control", "config/ekf_imu.yaml")
+    ekf_config_file = PathJoinSubstitution(
+        [FindPackageShare("silverhand_rover_control"), "config", "ekf_imu.yaml"]
+    )
 
     controllers_imu = copy.deepcopy(controllers_imu)
     controllers_imu["imu_sensor_broadcaster"]["ros__parameters"]["sensor_name"] = imu_name
@@ -233,6 +236,19 @@ def create_runtime_nodes(context):
     power_board_config = PathJoinSubstitution(
         [FindPackageShare("silverhand_rover_control"), "config", "power_board.yaml"]
     )
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        prefix="silverhand_system_controllers_",
+        suffix=".yaml",
+        delete=False,
+    ) as controllers_file:
+        yaml.safe_dump(selected_controllers, controllers_file, sort_keys=False)
+        selected_controllers_file = controllers_file.name
+
+    power_board_use_mock = _is_truthy(use_mock_hardware)
+    power_board_enabled = _is_truthy(use_power_board)
+    power_board_node_id = int(power_board_client_node_id)
+    rover_queue_len_value = int(rover_queue_len)
 
     actions = []
 
@@ -258,7 +274,7 @@ def create_runtime_nodes(context):
                     package="controller_manager",
                     executable="ros2_control_node",
                     output="screen",
-                    parameters=[robot_description, selected_controllers],
+                    parameters=[robot_description, selected_controllers_file],
                     remappings=[("/controller_manager/robot_description", "/robot_description")],
                 ),
                 Node(
@@ -288,7 +304,7 @@ def create_runtime_nodes(context):
             ]
         )
 
-        if _is_truthy(use_power_board):
+        if power_board_enabled:
             actions.append(
                 Node(
                     package="silverhand_rover_control",
@@ -297,10 +313,10 @@ def create_runtime_nodes(context):
                     parameters=[
                         power_board_config,
                         {
-                            "use_mock": _is_truthy(use_mock_hardware),
+                            "use_mock": power_board_use_mock,
                             "can_iface": rover_can_iface,
-                            "queue_len": rover_queue_len,
-                            "node_id": power_board_client_node_id,
+                            "queue_len": rover_queue_len_value,
+                            "node_id": power_board_node_id,
                         },
                     ],
                 )
@@ -320,7 +336,7 @@ def create_runtime_nodes(context):
                         executable="ekf_node",
                         name="ekf_filter_node",
                         output="screen",
-                        parameters=[ekf_config],
+                        parameters=[ekf_config_file],
                     ),
                 ]
             )

@@ -6,8 +6,10 @@ REPO_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 ROS_WS="${ROS_WS:-$(cd "${REPO_DIR}/../.." && pwd)}"
 ROS_DISTRO="${ROS_DISTRO:-jazzy}"
 
+set +u
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 source "${ROS_WS}/install/setup.bash"
+set -u
 
 args=("use_rviz:=${SILVERHAND_USE_RVIZ:-false}")
 

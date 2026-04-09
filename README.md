@@ -29,7 +29,6 @@ Upper-level bringup package for SilverHand orchestration.
 - full-system rover+arm+hand orchestration
 - GUI entrypoints
 - RViz-only viewer
-- legacy compatibility aliases
 
 ## Dependencies
 
@@ -196,16 +195,6 @@ Role-based convenience script:
 ./scripts/start_system_arm_hand_robot.sh
 ```
 
-Legacy aliases:
-
-```bash
-./scripts/start_system_real.sh
-./scripts/start_system_arm_hand_real.sh
-./scripts/start_system_arm_hand_moveit_mock.sh
-./scripts/start_system_arm_hand_moveit_real.sh
-./scripts/start_system_rover_real.sh
-```
-
 ## Environment Variables
 
 Общие:
@@ -264,14 +253,6 @@ Role-based instance:
 ```bash
 systemctl --user start silverhand-system-bringup@arm_hand_robot
 ```
-
-Legacy aliases всё ещё существуют, но не рекомендуются:
-
-- `real`
-- `arm_hand_real`
-- `arm_hand_moveit_mock`
-- `arm_hand_moveit_real`
-- `rover_real`
 
 ## Implementation Notes
 
