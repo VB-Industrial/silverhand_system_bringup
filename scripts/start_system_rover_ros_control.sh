@@ -9,18 +9,18 @@ ROS_DISTRO="${ROS_DISTRO:-jazzy}"
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 source "${ROS_WS}/install/setup.bash"
 
-args=("use_rviz:=${SILVERHAND_USE_RVIZ:-false}")
+args=()
 
 if [[ -n "${SILVERHAND_ROVER_CAN_IFACE:-}" ]]; then
-  args+=("rover_can_iface:=${SILVERHAND_ROVER_CAN_IFACE}")
+  args+=("can_iface:=${SILVERHAND_ROVER_CAN_IFACE}")
 fi
 
 if [[ -n "${SILVERHAND_ROVER_NODE_ID:-}" ]]; then
-  args+=("rover_node_id:=${SILVERHAND_ROVER_NODE_ID}")
+  args+=("node_id:=${SILVERHAND_ROVER_NODE_ID}")
 fi
 
 if [[ -n "${SILVERHAND_ROVER_QUEUE_LEN:-}" ]]; then
-  args+=("rover_queue_len:=${SILVERHAND_ROVER_QUEUE_LEN}")
+  args+=("queue_len:=${SILVERHAND_ROVER_QUEUE_LEN}")
 fi
 
 if [[ -n "${SILVERHAND_ROVER_USE_IMU_ODOMETRY:-}" ]]; then
@@ -35,4 +35,4 @@ if [[ -n "${SILVERHAND_ROVER_POWER_BOARD_CLIENT_NODE_ID:-}" ]]; then
   args+=("power_board_client_node_id:=${SILVERHAND_ROVER_POWER_BOARD_CLIENT_NODE_ID}")
 fi
 
-exec ros2 launch silverhand_system_bringup silverhand_system_mock.launch.py "${args[@]}"
+exec ros2 launch silverhand_system_bringup silverhand_system_rover_ros_control.launch.py "${args[@]}"

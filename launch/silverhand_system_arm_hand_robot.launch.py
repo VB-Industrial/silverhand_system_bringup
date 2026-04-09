@@ -6,8 +6,7 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    use_rviz = LaunchConfiguration("use_rviz")
-    rviz_config = LaunchConfiguration("rviz_config")
+    use_mock_hardware = LaunchConfiguration("use_mock_hardware")
 
     launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -16,22 +15,16 @@ def generate_launch_description():
             )
         ),
         launch_arguments={
-            "use_rviz": use_rviz,
-            "run_robot_bringup": "false",
-            "run_move_group": "false",
-            "rviz_config": rviz_config,
+            "use_rviz": "false",
+            "run_arm_hand_bringup": "true",
+            "run_move_group": "true",
+            "use_mock_hardware": use_mock_hardware,
         }.items(),
     )
 
     return LaunchDescription(
         [
-            DeclareLaunchArgument("use_rviz", default_value="true"),
-            DeclareLaunchArgument(
-                "rviz_config",
-                default_value=PathJoinSubstitution(
-                    [FindPackageShare("silverhand_system_bringup"), "config", "moveit.rviz"]
-                ),
-            ),
+            DeclareLaunchArgument("use_mock_hardware", default_value="true"),
             launch,
         ]
     )

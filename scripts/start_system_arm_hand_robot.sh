@@ -9,4 +9,5 @@ ROS_DISTRO="${ROS_DISTRO:-jazzy}"
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 source "${ROS_WS}/install/setup.bash"
 
-exec ros2 launch silverhand_system_bringup silverhand_system_view.launch.py
+exec ros2 launch silverhand_system_bringup silverhand_system_arm_hand_robot.launch.py \
+  use_mock_hardware:="${SILVERHAND_USE_MOCK_HARDWARE:-true}"

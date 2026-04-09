@@ -9,5 +9,5 @@ ROS_DISTRO="${ROS_DISTRO:-jazzy}"
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 source "${ROS_WS}/install/setup.bash"
 
-echo "DEPRECATED: start_system_rover_real.sh is a legacy alias. Use start_system_rover_ros_control.sh." >&2
-exec "${SCRIPT_DIR}/start_system_rover_ros_control.sh"
+echo "DEPRECATED: start_system_arm_hand_real.sh is a legacy alias. Use start_system_arm_hand_ros_control.sh." >&2
+exec "${SCRIPT_DIR}/start_system_arm_hand_ros_control.sh"

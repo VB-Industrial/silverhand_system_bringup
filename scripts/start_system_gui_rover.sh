@@ -9,5 +9,7 @@ ROS_DISTRO="${ROS_DISTRO:-jazzy}"
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 source "${ROS_WS}/install/setup.bash"
 
-echo "DEPRECATED: start_system_rover_real.sh is a legacy alias. Use start_system_rover_ros_control.sh." >&2
-exec "${SCRIPT_DIR}/start_system_rover_ros_control.sh"
+exec ros2 launch silverhand_system_bringup silverhand_system_gui_rover.launch.py \
+  ros_ws:="${ROS_WS}" \
+  host:="${SILVERHAND_ROVER_GUI_HOST:-0.0.0.0}" \
+  port:="${SILVERHAND_ROVER_GUI_PORT:-4174}"

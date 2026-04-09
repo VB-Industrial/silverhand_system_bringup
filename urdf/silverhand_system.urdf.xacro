@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<robot name="silverhand_system" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:include filename="$(find silverhand_rover_model)/urdf/silverhand_rover.urdf.xacro"/>
+  <xacro:include filename="$(find silverhand_rover_control)/ros2_control/silverhand_rover.ros2_control.xacro"/>
+  <xacro:include filename="$(find silverhand_arm_model)/urdf/silverhand_macro.urdf.xacro"/>
+  <xacro:include filename="$(find silverhand_arm_control)/ros2_control/silverhand.ros2_control.xacro"/>
+  <xacro:include filename="$(find silverhand_hand_model)/urdf/silverhand_hand_macro.urdf.xacro"/>
+  <xacro:include filename="$(find silverhand_hand_control)/ros2_control/silverhand_hand.ros2_control.xacro"/>
+
+  <xacro:arg name="use_mock_hardware" default="true"/>
+
+  <xacro:arg name="rover_can_iface" default="vcan1"/>
+  <xacro:arg name="rover_node_id" default="110"/>
+  <xacro:arg name="rover_queue_len" default="1000"/>
+  <xacro:arg name="imu_name" default="imu_sensor"/>
+  <xacro:arg name="imu_frame_id" default="imu_link"/>
+  <xacro:arg name="imu_device_path" default=""/>
+  <xacro:arg name="imu_vid" default="51966"/>
+  <xacro:arg name="imu_pid" default="16388"/>
+  <xacro:arg name="imu_report_size" default="64"/>
+
+  <xacro:arg name="arm_can_iface" default="can0"/>
+  <xacro:arg name="arm_node_id" default="100"/>
+  <xacro:arg name="arm_queue_len" default="1000"/>
+
+  <xacro:arg name="hand_can_iface" default="can0"/>
+  <xacro:arg name="hand_node_id" default="120"/>
+  <xacro:arg name="hand_queue_len" default="1000"/>
+
+  <link name="arm_mount_link"/>
+
+  <joint name="base_to_arm_mount_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="arm_mount_link"/>
+    <origin xyz="0.324 0.0 -0.076" rpy="0 0 0"/>
+  </joint>
+
+  <xacro:silverhand_arm
+    prefix=""
+    joint_prefix=""
+    link_prefix="arm_"
+    parent="arm_mount_link"
+    xyz="0 0 0"
+    rpy="0 0 0"/>
+
+  <xacro:silverhand_hand
+    prefix="hand_"
+    parent="arm_link_6"
+    xyz="0 0 0"
+    rpy="0 0 0"/>
+
+  <xacro:silverhand_rover_ros2_control
+    name="rover_system"
+    initial_positions_file="$(find silverhand_rover_control)/config/initial_positions.yaml"
+    use_mock_hardware="$(arg use_mock_hardware)"
+    can_iface="$(arg rover_can_iface)"
+    node_id="$(arg rover_node_id)"
+    queue_len="$(arg rover_queue_len)"
+    imu_name="$(arg imu_name)"
+    imu_frame_id="$(arg imu_frame_id)"
+    imu_device_path="$(arg imu_device_path)"
+    imu_vid="$(arg imu_vid)"
+    imu_pid="$(arg imu_pid)"
+    imu_report_size="$(arg imu_report_size)"/>
+
+  <xacro:silverhand_ros2_control
+    name="arm_system"
+    initial_positions_file="$(find silverhand_arm_control)/config/initial_positions.yaml"
+    use_mock_hardware="$(arg use_mock_hardware)"
+    can_iface="$(arg arm_can_iface)"
+    node_id="$(arg arm_node_id)"
+    queue_len="$(arg arm_queue_len)"/>
+
+  <xacro:silverhand_hand_ros2_control
+    name="hand_system"
+    initial_positions_file="$(find silverhand_hand_control)/config/initial_positions.yaml"
+    prefix="hand_"
+    use_mock_hardware="$(arg use_mock_hardware)"
+    can_iface="$(arg hand_can_iface)"
+    node_id="$(arg hand_node_id)"
+    queue_len="$(arg hand_queue_len)"/>
+</robot>

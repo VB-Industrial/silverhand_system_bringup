@@ -6,13 +6,14 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution(
-                [FindPackageShare("silverhand_system_bringup"), "launch", "silverhand_system_rover.launch.py"]
-            )
-        ),
-        launch_arguments={"use_mock_hardware": "true"}.items(),
+    return LaunchDescription(
+        [
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    PathJoinSubstitution(
+                        [FindPackageShare("silverhand_rover_control"), "launch", "silverhand_rover_mock.launch.py"]
+                    )
+                ),
+            ),
+        ]
     )
-
-    return LaunchDescription([launch])

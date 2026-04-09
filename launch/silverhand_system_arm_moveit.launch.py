@@ -13,12 +13,12 @@ def generate_launch_description():
     launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
-                [FindPackageShare("silverhand_system_bringup"), "launch", "silverhand_system_common.launch.py"]
+                [FindPackageShare("silverhand_system_bringup"), "launch", "silverhand_system_arm_common.launch.py"]
             )
         ),
         launch_arguments={
             "use_rviz": use_rviz,
-            "run_arm_hand_bringup": "true",
+            "run_arm_bringup": "true",
             "run_move_group": "true",
             "use_mock_hardware": use_mock_hardware,
             "rviz_config": rviz_config,

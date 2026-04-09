@@ -7,32 +7,28 @@ from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     use_rviz = LaunchConfiguration("use_rviz")
-    use_mock_hardware = LaunchConfiguration("use_mock_hardware")
     rviz_config = LaunchConfiguration("rviz_config")
 
     launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             PathJoinSubstitution(
-                [FindPackageShare("silverhand_system_bringup"), "launch", "silverhand_system_common.launch.py"]
+                [FindPackageShare("silverhand_system_bringup"), "launch", "silverhand_system_arm_hand.launch.py"]
             )
         ),
         launch_arguments={
             "use_rviz": use_rviz,
-            "run_arm_hand_bringup": "true",
-            "run_move_group": "true",
-            "use_mock_hardware": use_mock_hardware,
+            "use_mock_hardware": "true",
             "rviz_config": rviz_config,
         }.items(),
     )
 
     return LaunchDescription(
         [
-            DeclareLaunchArgument("use_rviz", default_value="true"),
-            DeclareLaunchArgument("use_mock_hardware", default_value="true"),
+            DeclareLaunchArgument("use_rviz", default_value="false"),
             DeclareLaunchArgument(
                 "rviz_config",
                 default_value=PathJoinSubstitution(
-                    [FindPackageShare("silverhand_system_bringup"), "config", "moveit.rviz"]
+                    [FindPackageShare("silverhand_system_bringup"), "config", "view.rviz"]
                 ),
             ),
             launch,

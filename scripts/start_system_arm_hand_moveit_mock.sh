@@ -9,10 +9,6 @@ ROS_DISTRO="${ROS_DISTRO:-jazzy}"
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 source "${ROS_WS}/install/setup.bash"
 
-exec ros2 launch silverhand_system_bringup silverhand_system_arm_hand_moveit.launch.py \
-  use_mock_hardware:=true \
-  use_rviz:="${SILVERHAND_USE_RVIZ:-false}" \
-  arm_can_iface:="${SILVERHAND_ARM_CAN_IFACE:-can0}" \
-  arm_node_id:="${SILVERHAND_ARM_NODE_ID:-100}" \
-  hand_can_iface:="${SILVERHAND_HAND_CAN_IFACE:-can0}" \
-  hand_node_id:="${SILVERHAND_HAND_NODE_ID:-120}"
+echo "DEPRECATED: start_system_arm_hand_moveit_mock.sh is a legacy alias. Use start_system_arm_hand_moveit.sh." >&2
+export SILVERHAND_USE_MOCK_HARDWARE="${SILVERHAND_USE_MOCK_HARDWARE:-true}"
+exec "${SCRIPT_DIR}/start_system_arm_hand_moveit.sh"

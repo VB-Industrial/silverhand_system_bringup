@@ -9,8 +9,5 @@ ROS_DISTRO="${ROS_DISTRO:-jazzy}"
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 source "${ROS_WS}/install/setup.bash"
 
-exec ros2 launch silverhand_system_bringup silverhand_system_real.launch.py \
-  arm_can_iface:="${SILVERHAND_ARM_CAN_IFACE:-can0}" \
-  arm_node_id:="${SILVERHAND_ARM_NODE_ID:-100}" \
-  hand_can_iface:="${SILVERHAND_HAND_CAN_IFACE:-can0}" \
-  hand_node_id:="${SILVERHAND_HAND_NODE_ID:-120}"
+echo "DEPRECATED: start_system_real.sh is a legacy alias. Use start_system_ros_control.sh." >&2
+exec "${SCRIPT_DIR}/start_system_ros_control.sh"

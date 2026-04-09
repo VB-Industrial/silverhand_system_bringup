@@ -3,12 +3,15 @@
   <xacro:include filename="$(find silverhand_arm_model)/urdf/silverhand_macro.urdf.xacro"/>
   <xacro:include filename="$(find silverhand_arm_control)/ros2_control/silverhand.ros2_control.xacro"/>
   <xacro:include filename="$(find silverhand_hand_model)/urdf/silverhand_hand_macro.urdf.xacro"/>
+  <xacro:include filename="$(find silverhand_hand_control)/ros2_control/silverhand_hand.ros2_control.xacro"/>
 
   <xacro:arg name="use_mock_hardware" default="true"/>
   <xacro:arg name="arm_can_iface" default="can0"/>
   <xacro:arg name="arm_node_id" default="100"/>
+  <xacro:arg name="arm_queue_len" default="1000"/>
   <xacro:arg name="hand_can_iface" default="can0"/>
   <xacro:arg name="hand_node_id" default="120"/>
+  <xacro:arg name="hand_queue_len" default="1000"/>
 
   <xacro:silverhand_arm prefix=""/>
   <xacro:silverhand_hand
@@ -22,38 +25,15 @@
     initial_positions_file="$(find silverhand_arm_control)/config/initial_positions.yaml"
     use_mock_hardware="$(arg use_mock_hardware)"
     can_iface="$(arg arm_can_iface)"
-    node_id="$(arg arm_node_id)"/>
+    node_id="$(arg arm_node_id)"
+    queue_len="$(arg arm_queue_len)"/>
 
-  <ros2_control name="hand_system" type="system">
-    <hardware>
-      <xacro:if value="$(arg use_mock_hardware)">
-        <plugin>mock_components/GenericSystem</plugin>
-      </xacro:if>
-      <xacro:unless value="$(arg use_mock_hardware)">
-        <plugin>silverhand_hand_control/SilverhandHandSystem</plugin>
-        <param name="can_iface">$(arg hand_can_iface)</param>
-        <param name="node_id">$(arg hand_node_id)</param>
-      </xacro:unless>
-    </hardware>
-
-    <joint name="hand_left_finger_joint">
-      <command_interface name="position"/>
-      <command_interface name="effort"/>
-      <state_interface name="position">
-        <param name="initial_value">0.0</param>
-      </state_interface>
-      <state_interface name="velocity"/>
-      <state_interface name="effort"/>
-    </joint>
-
-    <joint name="hand_right_finger_joint">
-      <command_interface name="position"/>
-      <command_interface name="effort"/>
-      <state_interface name="position">
-        <param name="initial_value">0.0</param>
-      </state_interface>
-      <state_interface name="velocity"/>
-      <state_interface name="effort"/>
-    </joint>
-  </ros2_control>
+  <xacro:silverhand_hand_ros2_control
+    name="hand_system"
+    initial_positions_file="$(find silverhand_hand_control)/config/initial_positions.yaml"
+    prefix="hand_"
+    use_mock_hardware="$(arg use_mock_hardware)"
+    can_iface="$(arg hand_can_iface)"
+    node_id="$(arg hand_node_id)"
+    queue_len="$(arg hand_queue_len)"/>
 </robot>

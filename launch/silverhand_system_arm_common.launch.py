@@ -34,20 +34,19 @@ def _is_truthy(value: str) -> bool:
 
 def create_runtime_nodes(context):
     use_rviz = LaunchConfiguration("use_rviz").perform(context)
-    run_arm_hand_bringup = LaunchConfiguration("run_arm_hand_bringup").perform(context)
+    run_arm_bringup = LaunchConfiguration("run_arm_bringup").perform(context)
     run_move_group = LaunchConfiguration("run_move_group").perform(context)
     use_mock_hardware = LaunchConfiguration("use_mock_hardware").perform(context)
     rviz_config = LaunchConfiguration("rviz_config").perform(context)
 
     profile_name = "mock" if _is_truthy(use_mock_hardware) else "ros_control"
     arm_profile = load_profile("silverhand_arm_control", profile_name)
-    hand_profile = load_profile("silverhand_hand_control", profile_name)
 
     description_file = PathJoinSubstitution(
-        [FindPackageShare("silverhand_system_bringup"), "urdf", "silverhand_arm_hand.urdf.xacro"]
+        [FindPackageShare("silverhand_arm_control"), "urdf", "silverhand.urdf.xacro"]
     )
-    ros2_controllers_file = PathJoinSubstitution(
-        [FindPackageShare("silverhand_system_bringup"), "config", "ros2_controllers.yaml"]
+    controllers_file = PathJoinSubstitution(
+        [FindPackageShare("silverhand_arm_control"), "config", "controllers.yaml"]
     )
 
     robot_description_content = Command(
@@ -59,44 +58,35 @@ def create_runtime_nodes(context):
             "use_mock_hardware:=",
             use_mock_hardware,
             " ",
-            "arm_can_iface:=",
+            "can_iface:=",
             str(arm_profile["can_iface"]),
             " ",
-            "arm_node_id:=",
+            "node_id:=",
             str(arm_profile["node_id"]),
             " ",
-            "arm_queue_len:=",
+            "queue_len:=",
             str(arm_profile["queue_len"]),
-            " ",
-            "hand_can_iface:=",
-            str(hand_profile["can_iface"]),
-            " ",
-            "hand_node_id:=",
-            str(hand_profile["node_id"]),
-            " ",
-            "hand_queue_len:=",
-            str(hand_profile["queue_len"]),
         ]
     )
 
     robot_description = {"robot_description": robot_description_content}
     robot_description_semantic = {
         "robot_description_semantic": load_file(
-            "silverhand_system_bringup", "config/silverhand.srdf"
+            "silverhand_system_bringup", "config/arm.srdf"
         )
     }
     robot_description_kinematics = {
         "robot_description_kinematics": load_yaml(
-            "silverhand_system_bringup", "config/kinematics.yaml"
+            "silverhand_system_bringup", "config/arm_kinematics.yaml"
         )
     }
     robot_description_planning = {
         "robot_description_planning": load_yaml(
-            "silverhand_system_bringup", "config/joint_limits.yaml"
+            "silverhand_system_bringup", "config/arm_joint_limits.yaml"
         )
     }
     moveit_controllers = load_yaml(
-        "silverhand_system_bringup", "config/moveit_controllers.yaml"
+        "silverhand_system_bringup", "config/arm_moveit_controllers.yaml"
     )
     ompl_config = load_yaml("silverhand_system_bringup", "config/ompl_planning.yaml")
 
@@ -122,7 +112,7 @@ def create_runtime_nodes(context):
 
     actions = []
 
-    if _is_truthy(run_arm_hand_bringup):
+    if _is_truthy(run_arm_bringup):
         actions.extend(
             [
                 Node(
@@ -141,7 +131,7 @@ def create_runtime_nodes(context):
                     package="controller_manager",
                     executable="ros2_control_node",
                     output="screen",
-                    parameters=[robot_description, ros2_controllers_file],
+                    parameters=[robot_description, controllers_file],
                     remappings=[("/controller_manager/robot_description", "/robot_description")],
                 ),
                 Node(
@@ -154,12 +144,6 @@ def create_runtime_nodes(context):
                     package="controller_manager",
                     executable="spawner",
                     arguments=["arm_controller", "--controller-manager", "/controller_manager"],
-                    output="screen",
-                ),
-                Node(
-                    package="controller_manager",
-                    executable="spawner",
-                    arguments=["hand_controller", "--controller-manager", "/controller_manager"],
                     output="screen",
                 ),
             ]
@@ -211,7 +195,7 @@ def generate_launch_description():
     return LaunchDescription(
         [
             DeclareLaunchArgument("use_rviz", default_value="true"),
-            DeclareLaunchArgument("run_arm_hand_bringup", default_value="true"),
+            DeclareLaunchArgument("run_arm_bringup", default_value="true"),
             DeclareLaunchArgument("run_move_group", default_value="true"),
             DeclareLaunchArgument("use_mock_hardware", default_value="true"),
             DeclareLaunchArgument(

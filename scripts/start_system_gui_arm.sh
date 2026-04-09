@@ -9,5 +9,5 @@ ROS_DISTRO="${ROS_DISTRO:-jazzy}"
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 source "${ROS_WS}/install/setup.bash"
 
-exec ros2 launch silverhand_system_bringup silverhand_system_gui.launch.py \
+exec ros2 launch silverhand_system_bringup silverhand_system_gui_arm.launch.py \
   use_rviz:="${SILVERHAND_USE_RVIZ:-true}"

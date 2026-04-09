@@ -1,32 +1,37 @@
 # silverhand_system_bringup
 
-Upper-level bringup package for the SilverHand system.
+Upper-level bringup package for SilverHand orchestration.
 
-Это верхняя точка входа для:
+Каноническая сущностная модель:
 
-- `arm + hand` direct `ros2_control`
-- `arm + hand + MoveIt`
-- `rover` direct bringup
+- `arm`
+- `arm_hand`
+- `rover`
+- `system = rover + arm + hand`
 
-Текущий пакет вырос из старого `silverhand_moveit2` и теперь играет роль общего orchestration-layer.
+Режимы:
 
-## Что включает
+- `arm`: `mock`, `ros_control`, `moveit`
+- `arm_hand`: `mock`, `ros_control`, `moveit`
+- `rover`: `mock`, `ros_control`
+- `system`: `mock`, `ros_control`, `moveit`
 
-- arm model/control:
-  - `silverhand_arm_model`
-  - `silverhand_arm_control`
-- hand model/control:
-  - `silverhand_hand_model`
-  - `silverhand_hand_control`
-- rover direct launch:
-  - `silverhand_rover_control`
-- MoveIt config:
-  - SRDF
-  - OMPL
-  - controller mapping
-  - RViz config
+`silverhand_system_bringup` теперь оркестрирует запуск. Источник правды для hardware transport defaults лежит в нижних пакетах:
 
-## Зависимости
+- [silverhand_arm_control/config/hardware_profiles.yaml](/home/r/silver_ws/src/silverhand_arm_control/config/hardware_profiles.yaml)
+- [silverhand_hand_control/config/hardware_profiles.yaml](/home/r/silver_ws/src/silverhand_hand_control/config/hardware_profiles.yaml)
+- [silverhand_rover_control/config/hardware_profiles.yaml](/home/r/silver_ws/src/silverhand_rover_control/config/hardware_profiles.yaml)
+
+## What This Package Owns
+
+- arm-only MoveIt orchestration
+- arm+hand MoveIt orchestration
+- full-system rover+arm+hand orchestration
+- GUI entrypoints
+- RViz-only viewer
+- legacy compatibility aliases
+
+## Dependencies
 
 - Ubuntu 24.04
 - ROS 2 Jazzy
@@ -46,7 +51,7 @@ sudo apt-get install -y \
   ros-jazzy-xacro
 ```
 
-## Workspace layout
+## Workspace Layout
 
 Ожидаемый layout:
 
@@ -55,6 +60,7 @@ sudo apt-get install -y \
 ~/silver_ws/src/silverhand_arm_control
 ~/silver_ws/src/silverhand_hand_model
 ~/silver_ws/src/silverhand_hand_control
+~/silver_ws/src/silverhand_rover_model
 ~/silver_ws/src/silverhand_rover_control
 ~/silver_ws/src/silverhand_system_bringup
 ```
@@ -62,10 +68,11 @@ sudo apt-get install -y \
 Опционально:
 
 ```bash
+~/silver_ws/src/silverhand_rover_teleop
 ~/silver_ws/src/silverhand_system_description
 ```
 
-## Сборка
+## Build
 
 ```bash
 cd ~/silver_ws
@@ -74,222 +81,221 @@ colcon build
 source install/setup.bash
 ```
 
-## Основные launch-файлы
+## Canonical Launch Files
 
-### Arm + hand direct
+### Arm
 
 ```bash
-ros2 launch silverhand_system_bringup silverhand_system_arm_hand_direct.launch.py use_mock_hardware:=true
+ros2 launch silverhand_system_bringup silverhand_system_arm_mock.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_arm_ros_control.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_arm_moveit.launch.py use_mock_hardware:=true use_rviz:=false
 ```
 
-Обёртки:
+### Arm + Hand
 
 ```bash
-ros2 launch silverhand_system_bringup silverhand_system_arm_hand_direct_mock.launch.py
-ros2 launch silverhand_system_bringup silverhand_system_arm_hand_direct_real.launch.py
-```
-
-### Arm + hand + MoveIt
-
-```bash
+ros2 launch silverhand_system_bringup silverhand_system_arm_hand_mock.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_arm_hand_ros_control.launch.py
 ros2 launch silverhand_system_bringup silverhand_system_arm_hand_moveit.launch.py use_mock_hardware:=true use_rviz:=false
 ```
 
-Это сейчас основной launch для robot-side `MoveIt` smoke/integration tests.
-
-### Rover only
-
-```bash
-ros2 launch silverhand_system_bringup silverhand_system_rover.launch.py use_mock_hardware:=true
-```
-
-Обёртки:
+### Rover
 
 ```bash
 ros2 launch silverhand_system_bringup silverhand_system_rover_mock.launch.py
-ros2 launch silverhand_system_bringup silverhand_system_rover_real.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_rover_ros_control.launch.py
 ```
 
-### Viewer only
+Low-level passthrough:
 
 ```bash
-ros2 launch silverhand_system_bringup silverhand_system_view.launch.py
+ros2 launch silverhand_system_bringup silverhand_system_rover.launch.py
 ```
 
-## Helper scripts
+`silverhand_system_rover.launch.py` просто включает upstream [silverhand_rover_bringup.launch.py](/home/r/silver_ws/src/silverhand_rover_control/launch/silverhand_rover_bringup.launch.py). Значения по умолчанию для rover transport и IMU задаются в `silverhand_rover_control`.
 
-В пакете есть стандартные helper-скрипты запуска.
+### Full System
 
-Базовые shorthand-режимы:
+Mock:
 
 ```bash
-cd /home/r/silver_ws/src/silverhand_system_bringup
+ros2 launch silverhand_system_bringup silverhand_system_mock.launch.py
+```
+
+ros2_control:
+
+```bash
+ros2 launch silverhand_system_bringup silverhand_system_ros_control.launch.py
+```
+
+MoveIt:
+
+```bash
+ros2 launch silverhand_system_bringup silverhand_system_moveit.launch.py use_mock_hardware:=true use_rviz:=false
+```
+
+Full-system launch использует:
+
+- rover как root `base_link`
+- arm links с префиксом `arm_`
+- arm joints без префикса `joint_1..joint_6`
+- hand joints `hand_left_finger_joint` и `hand_right_finger_joint`
+
+Это позволяет держать совместимость с существующими arm controllers и MoveIt-конфигом, но убрать конфликт `base_link` между rover и arm.
+
+## GUI And Visualization
+
+Arm GUI:
+
+```bash
+ros2 launch silverhand_system_bringup silverhand_system_gui_arm.launch.py
+```
+
+Rover GUI:
+
+```bash
+ros2 launch silverhand_system_bringup silverhand_system_gui_rover.launch.py
+```
+
+RViz-only viewer:
+
+```bash
+ros2 launch silverhand_system_bringup silverhand_system_view_only_rviz.launch.py
+```
+
+Role-based arm+hand MoveIt without RViz:
+
+```bash
+ros2 launch silverhand_system_bringup silverhand_system_arm_hand_robot.launch.py use_mock_hardware:=true
+```
+
+## Helper Scripts
+
+Канонические scripts:
+
+```bash
 ./scripts/start_system_mock.sh
-./scripts/start_system_real.sh
-./scripts/start_system_gui.sh
-./scripts/start_system_view.sh
+./scripts/start_system_ros_control.sh
+./scripts/start_system_moveit.sh
+./scripts/start_system_arm_mock.sh
+./scripts/start_system_arm_ros_control.sh
+./scripts/start_system_arm_moveit.sh
+./scripts/start_system_arm_hand_mock.sh
+./scripts/start_system_arm_hand_ros_control.sh
+./scripts/start_system_arm_hand_moveit.sh
+./scripts/start_system_rover_mock.sh
+./scripts/start_system_rover_ros_control.sh
+./scripts/start_system_gui_arm.sh
+./scripts/start_system_gui_rover.sh
+./scripts/start_system_view_only_rviz.sh
 ```
 
-Явные сценарии:
+Role-based convenience script:
 
 ```bash
-./scripts/start_system_arm_hand_direct_mock.sh
-./scripts/start_system_arm_hand_direct_real.sh
+./scripts/start_system_arm_hand_robot.sh
+```
+
+Legacy aliases:
+
+```bash
+./scripts/start_system_real.sh
+./scripts/start_system_arm_hand_real.sh
 ./scripts/start_system_arm_hand_moveit_mock.sh
 ./scripts/start_system_arm_hand_moveit_real.sh
-./scripts/start_system_rover_mock.sh
 ./scripts/start_system_rover_real.sh
 ```
 
-Поддерживаемые переменные окружения:
+## Environment Variables
+
+Общие:
 
 - `ROS_WS`
 - `ROS_DISTRO`
 - `SILVERHAND_USE_RVIZ`
-- `SILVERHAND_ARM_CAN_IFACE`
-- `SILVERHAND_ARM_NODE_ID`
-- `SILVERHAND_HAND_CAN_IFACE`
-- `SILVERHAND_HAND_NODE_ID`
+- `SILVERHAND_USE_MOCK_HARDWARE`
+
+Rover overrides:
+
 - `SILVERHAND_ROVER_CAN_IFACE`
 - `SILVERHAND_ROVER_NODE_ID`
 - `SILVERHAND_ROVER_QUEUE_LEN`
+- `SILVERHAND_ROVER_USE_IMU_ODOMETRY`
+- `SILVERHAND_ROVER_USE_POWER_BOARD`
+- `SILVERHAND_ROVER_POWER_BOARD_CLIENT_NODE_ID`
 
-## Role-based launch
+Rover GUI:
 
-### Robot machine
+- `SILVERHAND_ROVER_GUI_HOST`
+- `SILVERHAND_ROVER_GUI_PORT`
 
-```bash
-ros2 launch silverhand_system_bringup silverhand_system_robot.launch.py use_mock_hardware:=true
-```
+Важно:
 
-### GUI machine
-
-```bash
-ros2 launch silverhand_system_bringup silverhand_system_gui.launch.py
-```
-
-Без RViz:
-
-```bash
-ros2 launch silverhand_system_bringup silverhand_system_gui.launch.py use_rviz:=false
-```
-
-## Что реально протестировано
-
-На текущий момент подтвержден рабочий сценарий:
-
-- `silverhand_system_arm_hand_moveit.launch.py`
-- `use_mock_hardware:=true`
-- `use_rviz:=false`
-- robot-side `ws_gateway --mode moveit`
-- GUI подключается по websocket и шлёт `set_joint_goal`
-
-По этой схеме реально проходят:
-
-- planning через `MoveGroup`
-- execution через `arm_controller`
-- `joint_state` обратно в GUI
-
-## Полезные проверки
-
-Контроллеры:
-
-```bash
-ros2 control list_controllers
-```
-
-Ожидаемо активны:
-
-- `joint_state_broadcaster`
-- `arm_controller`
-- `hand_controller`
-
-Action server MoveIt:
-
-```bash
-ros2 action list | grep move_action
-```
-
-Action server direct arm control:
-
-```bash
-ros2 action list | grep follow_joint_trajectory
-```
-
-## Логи
-
-Если поднимаешь через `nohup`, удобно вести:
-
-- `~/silver_ws/run_logs/system_bringup_moveit.log`
-
-В этом логе обычно ищутся:
-
-- `MoveGroupMoveAction: Received request`
-- `Solution was found and executed`
-- `START_STATE_INVALID`
-- `GOAL_STATE_INVALID`
-- сообщения от `arm_controller` / `hand_controller`
+- arm/hand transport defaults больше не задаются в `silverhand_system_bringup`
+- system-level rover overrides здесь только переопределяют defaults из `silverhand_rover_control`, но не заменяют источник правды
 
 ## systemd
 
-Для `systemd --user` есть template:
+User service template:
 
-- `systemd/user/silverhand-system-bringup@.service`
+- [silverhand-system-bringup@.service](/home/r/silver_ws/src/silverhand_system_bringup/systemd/user/silverhand-system-bringup@.service)
 
-Поддерживаемые instance-имена:
+Канонические instance names:
 
-- `mock`
+```bash
+systemctl --user start silverhand-system-bringup@mock
+systemctl --user start silverhand-system-bringup@ros_control
+systemctl --user start silverhand-system-bringup@moveit
+systemctl --user start silverhand-system-bringup@arm_mock
+systemctl --user start silverhand-system-bringup@arm_ros_control
+systemctl --user start silverhand-system-bringup@arm_moveit
+systemctl --user start silverhand-system-bringup@arm_hand_mock
+systemctl --user start silverhand-system-bringup@arm_hand_ros_control
+systemctl --user start silverhand-system-bringup@arm_hand_moveit
+systemctl --user start silverhand-system-bringup@rover_mock
+systemctl --user start silverhand-system-bringup@rover_ros_control
+systemctl --user start silverhand-system-bringup@gui_arm
+systemctl --user start silverhand-system-bringup@gui_rover
+systemctl --user start silverhand-system-bringup@view_only_rviz
+```
+
+Role-based instance:
+
+```bash
+systemctl --user start silverhand-system-bringup@arm_hand_robot
+```
+
+Legacy aliases всё ещё существуют, но не рекомендуются:
+
 - `real`
-- `gui`
-- `view`
-- `arm_hand_direct_mock`
-- `arm_hand_direct_real`
+- `arm_hand_real`
 - `arm_hand_moveit_mock`
 - `arm_hand_moveit_real`
-- `rover_mock`
 - `rover_real`
 
-Установка:
+## Implementation Notes
 
-```bash
-mkdir -p ~/.config/systemd/user
-cp /home/r/silver_ws/src/silverhand_system_bringup/systemd/user/silverhand-system-bringup@.service ~/.config/systemd/user/
-systemctl --user daemon-reload
-```
+Full-system URDF:
 
-Примеры запуска:
+- [silverhand_system.urdf.xacro](/home/r/silver_ws/src/silverhand_system_bringup/urdf/silverhand_system.urdf.xacro)
 
-```bash
-systemctl --user enable --now silverhand-system-bringup@arm_hand_moveit_mock.service
-systemctl --user enable --now silverhand-system-bringup@arm_hand_direct_real.service
-systemctl --user enable --now silverhand-system-bringup@rover_mock.service
-```
+Full-system launch core:
 
-Автозапуск на старте системы без интерактивного логина:
+- [silverhand_system_full_common.launch.py](/home/r/silver_ws/src/silverhand_system_bringup/launch/silverhand_system_full_common.launch.py)
 
-```bash
-loginctl enable-linger "$USER"
-```
+Full-system SRDF:
 
-Полезные команды:
+- [system.srdf](/home/r/silver_ws/src/silverhand_system_bringup/config/system.srdf)
 
-```bash
-systemctl --user status silverhand-system-bringup@arm_hand_moveit_mock.service
-journalctl --user -u silverhand-system-bringup@arm_hand_moveit_mock.service -f
-systemctl --user restart silverhand-system-bringup@arm_hand_moveit_mock.service
-systemctl --user disable --now silverhand-system-bringup@arm_hand_moveit_mock.service
-```
+## Verified
 
-## Важные замечания
+Проверено:
 
-- arm joints сейчас `continuous`, то есть жёстких position bounds у руки в URDF нет
-- реальные жёсткие limits есть у пальцев
-- не все ошибки `START_STATE_INVALID` означают “плохие joint limits”; часто это уже вопрос валидности стартового состояния в `MoveIt`
-- `link_4 ↔ hand_gripper_link` сейчас не отключён в `SRDF`, потому что эта самоколлизия может быть полезной и должна отслеживаться честно
-
-## Ближайшее развитие
-
-- единый `full-system` bringup для rover + arm + hand
-- дальнейшее согласование controller managers / robot descriptions
-- интеграция `nav2`
-- работа с единым system-level websocket gateway
+- `python3 -m py_compile launch/*.launch.py`
+- `bash -n scripts/*.sh`
+- `colcon build --packages-select silverhand_arm_model silverhand_system_bringup`
+- `xacro` для full-system URDF разворачивается с rover `base_link`, arm links `arm_*` и arm joints `joint_1..joint_6`
+- `ros2 launch ... --show-args` для
+  - `silverhand_system_mock.launch.py`
+  - `silverhand_system_ros_control.launch.py`
+  - `silverhand_system_moveit.launch.py`

@@ -35,4 +35,4 @@ if [[ -n "${SILVERHAND_ROVER_POWER_BOARD_CLIENT_NODE_ID:-}" ]]; then
   args+=("power_board_client_node_id:=${SILVERHAND_ROVER_POWER_BOARD_CLIENT_NODE_ID}")
 fi
 
-exec ros2 launch silverhand_system_bringup silverhand_system_mock.launch.py "${args[@]}"
+exec ros2 launch silverhand_system_bringup silverhand_system_ros_control.launch.py "${args[@]}"

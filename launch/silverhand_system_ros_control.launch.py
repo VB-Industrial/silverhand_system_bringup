@@ -9,19 +9,6 @@ def generate_launch_description():
     use_rviz = LaunchConfiguration("use_rviz")
     rviz_config = LaunchConfiguration("rviz_config")
 
-    launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            PathJoinSubstitution(
-                [FindPackageShare("silverhand_system_bringup"), "launch", "silverhand_system_arm_hand_direct.launch.py"]
-            )
-        ),
-        launch_arguments={
-            "use_rviz": use_rviz,
-            "use_mock_hardware": "true",
-            "rviz_config": rviz_config,
-        }.items(),
-    )
-
     return LaunchDescription(
         [
             DeclareLaunchArgument("use_rviz", default_value="false"),
@@ -31,6 +18,19 @@ def generate_launch_description():
                     [FindPackageShare("silverhand_system_bringup"), "config", "view.rviz"]
                 ),
             ),
-            launch,
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    PathJoinSubstitution(
+                        [FindPackageShare("silverhand_system_bringup"), "launch", "silverhand_system_full_common.launch.py"]
+                    )
+                ),
+                launch_arguments={
+                    "use_rviz": use_rviz,
+                    "run_system_bringup": "true",
+                    "run_move_group": "false",
+                    "use_mock_hardware": "false",
+                    "rviz_config": rviz_config,
+                }.items(),
+            ),
         ]
     )
