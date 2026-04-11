@@ -16,8 +16,8 @@
 
   <group_state name="home" group="silverhand_arm">
     <joint name="joint_1" value="0.0"/>
-    <joint name="joint_2" value="0.0"/>
-    <joint name="joint_3" value="0.0"/>
+    <joint name="joint_2" value="-1.57"/>
+    <joint name="joint_3" value="3.14"/>
     <joint name="joint_4" value="0.0"/>
     <joint name="joint_5" value="0.0"/>
     <joint name="joint_6" value="0.0"/>
@@ -35,8 +35,8 @@
 
   <group_state name="home" group="silverhand_arm_hand">
     <joint name="joint_1" value="0.0"/>
-    <joint name="joint_2" value="0.0"/>
-    <joint name="joint_3" value="0.0"/>
+    <joint name="joint_2" value="-1.57"/>
+    <joint name="joint_3" value="3.14"/>
     <joint name="joint_4" value="0.0"/>
     <joint name="joint_5" value="0.0"/>
     <joint name="joint_6" value="0.0"/>
@@ -78,7 +78,15 @@
   <disable_collisions link1="arm_arm_root_link" link2="arm_link_1" reason="Adjacent"/>
   <disable_collisions link1="arm_link_1" link2="arm_link_2" reason="Adjacent"/>
   <disable_collisions link1="arm_link_2" link2="arm_link_3" reason="Adjacent"/>
+  <disable_collisions link1="arm_link_2" link2="arm_big_arm_cover_link" reason="Adjacent"/>
+  <disable_collisions link1="arm_link_3" link2="arm_big_arm_cover_link" reason="Never"/>
+  <disable_collisions link1="arm_link_3" link2="arm_camera" reason="Adjacent"/>
+  <disable_collisions link1="arm_link_4" link2="arm_camera" reason="Never"/>
   <disable_collisions link1="arm_link_3" link2="arm_link_4" reason="Adjacent"/>
+  <disable_collisions link1="arm_link_4" link2="arm_j4-el-tcover" reason="Adjacent"/>
+  <disable_collisions link1="arm_link_4" link2="arm_j5-cover" reason="Adjacent"/>
+  <disable_collisions link1="arm_link_5" link2="arm_j4-el-tcover" reason="Never"/>
+  <disable_collisions link1="arm_link_5" link2="arm_j5-cover" reason="Never"/>
   <disable_collisions link1="arm_link_4" link2="arm_link_5" reason="Adjacent"/>
   <disable_collisions link1="arm_link_5" link2="arm_link_6" reason="Adjacent"/>
   <disable_collisions link1="arm_link_6" link2="hand_base_link" reason="Adjacent"/>
